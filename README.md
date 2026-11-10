@@ -134,6 +134,8 @@ This test also found a real problem:
   - the cut first raises the minimum accepted timestamp, which freezes the data below the boundary;
   - it then writes the blocks without blocking appends.
 
+CI later found a second defect on Linux: a kill during the deletion of compacted blocks could leave a half-deleted block directory, which stopped the next start. Blocks are now renamed to `<id>.deleted` (an atomic step) before they are removed, and leftovers are cleaned up on open.
+
 A process kill tests crash consistency: torn records, interrupted block writes and compactions. It cannot test power loss. Data that was not yet fsynced would then be lost from the OS cache, and the fsync before each acknowledgement exists for that case.
 
 A kill never left a torn WAL record in these runs (the OS keeps whatever the process had written). Torn and corrupted records are covered by unit tests: a truncated tail, and a flipped byte in the middle.

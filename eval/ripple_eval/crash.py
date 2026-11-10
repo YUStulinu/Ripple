@@ -21,6 +21,7 @@ Writes results/crash.json.
 from __future__ import annotations
 
 import argparse
+import http.client
 import random
 import shutil
 import threading
@@ -29,6 +30,7 @@ import time
 from .common import DATA, Server, save
 
 SERIES = 200
+LOG = DATA / "crash-server.log"  # the servers' stderr, for diagnosing a failed restart
 STEPS = 5
 
 
@@ -62,12 +64,14 @@ def main():
     a = ap.parse_args()
     d = DATA / "crash"
     shutil.rmtree(d, ignore_errors=True)
+    DATA.mkdir(exist_ok=True)
+    LOG.unlink(missing_ok=True)
     rng = random.Random(3)
     acked: dict = {}
     k = 0
     t0 = 1_700_000_000_000
     rounds = []
-    srv = Server(d, "--block-range", "10m")
+    srv = Server(d, "--block-range", "10m", log=LOG)
     for r in range(a.rounds):
         stop = threading.Event()
         state = {"inflight": None, "acked_batches": 0, "error": None}
@@ -80,7 +84,7 @@ def main():
                 state["inflight"] = exp
                 try:
                     st, rejected = srv.post_checked(body, c)
-                except OSError:
+                except (OSError, http.client.HTTPException):
                     return  # the server died mid-request: this batch is unacknowledged
                 if st != 204 or rejected:
                     state["error"] = f"status {st}, {rejected} samples rejected"
@@ -102,7 +106,7 @@ def main():
         if inflight is not None:
             k += 1  # never reuse the timestamps of a batch that may have been written
         t_restart = time.perf_counter()
-        srv = Server(d, "--block-range", "10m")
+        srv = Server(d, "--block-range", "10m", log=LOG)
         recovery = time.perf_counter() - t_restart
         got, dups = read_back(srv)
         st = srv.stats()

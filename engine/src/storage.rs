@@ -263,6 +263,14 @@ fn write_block(blocks_dir: &Path, mint: i64, end: i64, level: u32, sources: &[St
     Ok(id)
 }
 
+/// Deletes a block directory so that a crash part-way leaves no half-deleted block: it is first
+/// renamed (atomically) to `<id>.deleted`, which `Db::open` removes.
+fn delete_block_dir(dir: &Path) -> io::Result<()> {
+    let gone = dir.with_extension("deleted");
+    fs::rename(dir, &gone)?;
+    fs::remove_dir_all(&gone)
+}
+
 impl Block {
     pub fn open(dir: &Path) -> io::Result<Block> {
         let bad = |m: &str| io::Error::new(io::ErrorKind::InvalidData, format!("{}: {m}", dir.display()));
@@ -395,8 +403,8 @@ impl Db {
         let mut blocks = vec![];
         for e in fs::read_dir(&bdir)? {
             let p = e?.path();
-            if p.extension().is_some_and(|x| x == "tmp") {
-                fs::remove_dir_all(&p)?; // an interrupted block write
+            if p.extension().is_some_and(|x| x == "tmp" || x == "deleted") {
+                fs::remove_dir_all(&p)?; // an interrupted block write or deletion
             } else if p.is_dir() {
                 blocks.push(Block::open(&p)?);
             }
@@ -404,7 +412,7 @@ impl Db {
         // A compaction that crashed before deleting its inputs: the inputs are redundant.
         let parents: std::collections::HashSet<String> = blocks.iter().flat_map(|b| b.sources.clone()).collect();
         for b in blocks.iter().filter(|b| parents.contains(&b.id)) {
-            fs::remove_dir_all(&b.dir)?;
+            delete_block_dir(&b.dir)?;
         }
         blocks.retain(|b| !parents.contains(&b.id));
         blocks.sort_by_key(|b| b.mint);
@@ -824,7 +832,7 @@ impl Db {
             old
         };
         for d in old {
-            fs::remove_dir_all(d)?;
+            delete_block_dir(&d)?;
         }
         Ok(())
     }
@@ -843,7 +851,7 @@ impl Db {
         };
         let n = old.len();
         for d in old {
-            fs::remove_dir_all(d)?;
+            delete_block_dir(&d)?;
         }
         Ok(n)
     }
@@ -1032,8 +1040,12 @@ up 1
         }
         // An interrupted block write and a copy of a compacted block's parent.
         fs::create_dir_all(d.path().join("blocks/abc.tmp")).unwrap();
+        // A deletion interrupted half-way: only the renamed directory, with some files left.
+        fs::create_dir_all(d.path().join("blocks/def.deleted")).unwrap();
+        fs::write(d.path().join("blocks/def.deleted/chunks"), b"x").unwrap();
         let before = all(&Db::open(d.path(), opts()).unwrap(), "x")[0].1.len();
         assert!(!d.path().join("blocks/abc.tmp").exists());
+        assert!(!d.path().join("blocks/def.deleted").exists());
         assert_eq!(before, 2000);
     }
 }

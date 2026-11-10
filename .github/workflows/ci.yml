@@ -36,7 +36,17 @@ jobs:
           python -m pytest -q tests
       - name: Crash recovery, 8 forced kills
         working-directory: eval
-        run: python -m ripple_eval.crash --rounds 8
+        shell: bash
+        run: |
+          set +e
+          python -m ripple_eval.crash --rounds 8 > crash.out 2>&1
+          status=$?
+          cat crash.out
+          if [ $status -ne 0 ]; then
+            tail -n 15 crash.out | while IFS= read -r l; do echo "::error::$l"; done
+            tail -n 10 ../data/crash-server.log 2>/dev/null | while IFS= read -r l; do echo "::error::server: $l"; done
+          fi
+          exit $status
 
   agent:
     name: Go agent
