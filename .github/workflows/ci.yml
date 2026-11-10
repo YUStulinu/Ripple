@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  engine:
+    name: Rust engine (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Clippy
+        working-directory: engine
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Tests
+        working-directory: engine
+        run: cargo test
+      - name: Release build
+        working-directory: engine
+        run: cargo build --release
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python tests (include a server round trip and a hard kill)
+        working-directory: eval
+        run: |
+          pip install -r requirements.txt
+          python -m pytest -q tests
+      - name: Crash recovery, 8 forced kills
+        working-directory: eval
+        run: python -m ripple_eval.crash --rounds 8
+
+  agent:
+    name: Go agent
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: agent/go.mod
+      - working-directory: agent
+        run: |
+          test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+          go vet ./...
+          go test -v ./...
+
+  web:
+    name: Dashboard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - working-directory: web
+        run: |
+          npm ci
+          npm test
+          npm run build

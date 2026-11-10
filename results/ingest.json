@@ -1,0 +1,70 @@
+{
+ "ripple_load_fsync": {
+  "batch": 10000,
+  "block_bytes": 62692803,
+  "block_chunk_bytes": 61045964,
+  "block_samples": 8640000,
+  "blocks": 3,
+  "bytes_per_sample": 7.256111458333334,
+  "chunk_bytes_per_sample": 7.065505092592592,
+  "final_flush_and_compaction_seconds": 0.2523261,
+  "fsync": true,
+  "maintenance_seconds": 1.4350421,
+  "rejected": 0,
+  "samples": 8640000,
+  "samples_per_second": 779934.6290207988,
+  "seconds": 11.0778515,
+  "series": 1000
+ },
+ "ripple_load_no_fsync": {
+  "batch": 10000,
+  "block_bytes": 62692803,
+  "block_chunk_bytes": 61045964,
+  "block_samples": 8640000,
+  "blocks": 3,
+  "bytes_per_sample": 7.256111458333334,
+  "chunk_bytes_per_sample": 7.065505092592592,
+  "final_flush_and_compaction_seconds": 0.2512108,
+  "fsync": false,
+  "maintenance_seconds": 1.7694168000000001,
+  "rejected": 0,
+  "samples": 8640000,
+  "samples_per_second": 1041539.3121659918,
+  "seconds": 8.2954142,
+  "series": 1000
+ },
+ "ripple_http": {
+  "samples": 8640000,
+  "seconds": 11.199928300000465,
+  "samples_per_second": 771433.5099805631,
+  "threads": 4,
+  "batch": 10000,
+  "appended": 8640000,
+  "rejected": 0
+ },
+ "sqlite": {
+  "samples": 8640000,
+  "seconds": 236.4648288999997,
+  "samples_per_second": 36538.203335320664,
+  "bytes": 221347840,
+  "bytes_per_sample": 25.618962962962964,
+  "sqlite_version": "3.50.4"
+ },
+ "ripple_load_fsync_final": {
+  "batch": 10000,
+  "block_bytes": 62692803,
+  "block_chunk_bytes": 61045964,
+  "block_samples": 8640000,
+  "blocks": 3,
+  "bytes_per_sample": 7.256111458333334,
+  "chunk_bytes_per_sample": 7.065505092592592,
+  "final_flush_and_compaction_seconds": 0.1416727,
+  "fsync": true,
+  "maintenance_seconds": 1.0187398,
+  "rejected": 0,
+  "samples": 8640000,
+  "samples_per_second": 1114839.1556130815,
+  "seconds": 7.7499969,
+  "series": 1000
+ }
+}

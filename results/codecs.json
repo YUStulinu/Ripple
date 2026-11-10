@@ -1,0 +1,72 @@
+{
+ "tsbs": {
+  "decimal_zstd1": {
+   "blocks": 2000,
+   "bytes_per_sample": 7.443332638888889,
+   "decode_msamples_per_s": 39.02516581178668,
+   "encode_msamples_per_s": 24.967677838353936,
+   "float_fallback_blocks": 1988
+  },
+  "decimal_zstd3": {
+   "blocks": 2000,
+   "bytes_per_sample": 7.433981134259259,
+   "decode_msamples_per_s": 35.11799687596153,
+   "encode_msamples_per_s": 21.27461539484357,
+   "float_fallback_blocks": 1988
+  },
+  "gorilla": {
+   "bytes_per_sample": 7.065505092592592,
+   "checksum": 431291722.11505705,
+   "decode_msamples_per_s": 23.16402947944474,
+   "encode_msamples_per_s": 16.774572078530625
+  },
+  "raw": {
+   "bytes_per_sample": 16.0
+  },
+  "samples": 8640000,
+  "series": 1000,
+  "zstd19_raw": {
+   "bytes_per_sample": 9.482257523148148,
+   "encode_msamples_per_s": 0.22746431701573389
+  },
+  "zstd3_raw": {
+   "bytes_per_sample": 9.694042476851852,
+   "encode_msamples_per_s": 9.87786545272578
+  }
+ },
+ "live": {
+  "decimal_zstd1": {
+   "blocks": 318,
+   "bytes_per_sample": 1.4358251459490246,
+   "decode_msamples_per_s": 43.21846153846155,
+   "encode_msamples_per_s": 10.543620231500247,
+   "float_fallback_blocks": 7
+  },
+  "decimal_zstd3": {
+   "blocks": 318,
+   "bytes_per_sample": 1.3939057382884807,
+   "decode_msamples_per_s": 46.80127948820472,
+   "encode_msamples_per_s": 10.389821732376655,
+   "float_fallback_blocks": 7
+  },
+  "gorilla": {
+   "bytes_per_sample": 1.9251174711661683,
+   "checksum": 581075889135776.2,
+   "decode_msamples_per_s": 39.171175191031296,
+   "encode_msamples_per_s": 39.46392447741065
+  },
+  "raw": {
+   "bytes_per_sample": 16.0
+  },
+  "samples": 70230,
+  "series": 318,
+  "zstd19_raw": {
+   "bytes_per_sample": 3.9782286772034743,
+   "encode_msamples_per_s": 0.37108721738482586
+  },
+  "zstd3_raw": {
+   "bytes_per_sample": 3.943343300583796,
+   "encode_msamples_per_s": 9.90787635963489
+  }
+ }
+}

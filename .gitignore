@@ -1,0 +1,10 @@
+data/
+logs/
+results/*.log
+.venv/
+__pycache__/
+engine/target/
+web/node_modules/
+web/dist/
+agent/agent
+agent/agent.exe
